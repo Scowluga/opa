@@ -516,6 +516,14 @@ bundles:
       max_delay_seconds: 120
 ```
 
+#### Azure Metadata Token
+
+OPA will authenticate with Azure managed identities ...
+
+##### Example
+
+...
+
 #### Custom Plugin
 
 If none of the existing credential options work for a service, OPA can authenticate using a custom plugin, enabling support for any authentication scheme.
