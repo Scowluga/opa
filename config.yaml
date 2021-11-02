@@ -1,0 +1,11 @@
+services:
+  azure:
+    url: https://management.azure.com/subscriptions/470283e9-8927-4825-9e8c-89aa287353f0/resourceGroups/OPA-Test3?api-version=2016-09-01
+    response_header_timeout_seconds: 5
+    credentials:
+      azure_managed_identity:
+        resource: https://management.azure.com/
+
+status:
+  service: azure
+  console: true
