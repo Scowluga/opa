@@ -516,9 +516,9 @@ bundles:
       max_delay_seconds: 120
 ```
 
-#### Azure Metadata Token
+#### Azure Managed Identities Token
 
-OPA will authenticate with Azure managed identities ...
+OPA will authenticate using managed identities for Azure resources following the provided [docs](https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/how-to-use-vm-token#get-a-token-using-http).
 
 ##### Example
 

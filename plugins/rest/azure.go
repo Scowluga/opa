@@ -11,7 +11,8 @@ import (
 
 var (
 	azureIMDSEndpoint = "http://169.254.169.254/metadata/identity/oauth2/token"
-	timeout = time.Duration(5) * time.Second
+	defaultApiVersion = "2018-02-01"
+	timeout           = time.Duration(5) * time.Second
 )
 
 // azureManagedIdentitiesToken holds a token for managed identities for Azure resources
@@ -41,18 +42,18 @@ type azureManagedIdentitiesAuthPlugin struct {
 	Endpoint   string `json:"endpoint"`
 	APIVersion string `json:"api_version"`
 	Resource   string `json:"resource"`
-	ObjectId   string `json:"object_id"`
-	ClientId   string `json:"client_id"`
-	MiResId    string `json:"mi_res_id"`
+	ObjectID   string `json:"object_id"`
+	ClientID   string `json:"client_id"`
+	MiResID    string `json:"mi_res_id"`
 }
 
 func (ap *azureManagedIdentitiesAuthPlugin) NewClient(c Config) (*http.Client, error) {
-	if ap.APIVersion == "" {
-		return nil, errors.New("API version is required when the azure managed identities plugin is enabled")
-	}
-
 	if ap.Resource == "" {
 		return nil, errors.New("resource URI is required when the azure managed identities plugin is enabled")
+	}
+
+	if ap.APIVersion == "" {
+		ap.APIVersion = defaultApiVersion
 	}
 
 	if ap.Endpoint == "" {
@@ -70,7 +71,7 @@ func (ap *azureManagedIdentitiesAuthPlugin) NewClient(c Config) (*http.Client, e
 func (ap *azureManagedIdentitiesAuthPlugin) Prepare(req *http.Request) error {
 	token, err := azureManagedIdentitiesTokenRequest(
 		ap.Endpoint, ap.APIVersion, ap.Resource,
-		ap.ObjectId, ap.ClientId, ap.MiResId,
+		ap.ObjectID, ap.ClientID, ap.MiResID,
 	)
 	if err != nil {
 		return err
