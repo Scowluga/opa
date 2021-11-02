@@ -3,11 +3,12 @@ package rest
 import (
 	"context"
 	"fmt"
-	"github.com/open-policy-agent/opa/keys"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/open-policy-agent/opa/keys"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAzureManagedIdentitiesAuthPlugin_NewClient(t *testing.T) {
