@@ -33,9 +33,8 @@ func TestAzureManagedIdentitiesAuthPlugin_NewClient(t *testing.T) {
 	nonEmptyString := func(value string, defaultValue string) string {
 		if value == "" {
 			return defaultValue
-		} else {
-			return value
 		}
+		return value
 	}
 
 	for _, tt := range tests {
