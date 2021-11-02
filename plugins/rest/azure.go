@@ -27,14 +27,14 @@ type azureManagedIdentitiesToken struct {
 
 // azureManagedIdentitiesError represents an error fetching an azureManagedIdentitiesToken
 type azureManagedIdentitiesError struct {
-	err         string `json:"error"`
-	description string `json:"error_description"`
-	endpoint    string
-	statusCode  int
+	Err         string `json:"error"`
+	Description string `json:"error_description"`
+	Endpoint    string
+	StatusCode  int
 }
 
 func (e *azureManagedIdentitiesError) Error() string {
-	return fmt.Sprintf("%v %s retrieving azure token from %s: %s", e.statusCode, e.err, e.endpoint, e.description)
+	return fmt.Sprintf("%v %s retrieving azure token from %s: %s", e.StatusCode, e.Err, e.Endpoint, e.Description)
 }
 
 // azureManagedIdentitiesAuthPlugin uses an azureManagedIdentitiesToken.AccessToken for bearer authorization
@@ -85,11 +85,12 @@ func (ap *azureManagedIdentitiesAuthPlugin) Prepare(req *http.Request) error {
 func azureManagedIdentitiesTokenRequest(
 	endpoint, apiVersion, resource, objectID, clientID, miResID string,
 ) (azureManagedIdentitiesToken, error) {
+	var token azureManagedIdentitiesToken
 	e := buildAzureManagedIdentitiesRequestPath(endpoint, apiVersion, resource, objectID, clientID, miResID)
 
 	request, err := http.NewRequest("GET", e, nil)
 	if err != nil {
-		return azureManagedIdentitiesToken{}, err
+		return token, err
 	}
 	request.Header.Add("Metadata", "true")
 
@@ -112,8 +113,8 @@ func azureManagedIdentitiesTokenRequest(
 			return azureManagedIdentitiesToken{}, err
 		}
 
-		azureError.endpoint = e
-		azureError.statusCode = s
+		azureError.Endpoint = e
+		azureError.StatusCode = s
 		return azureManagedIdentitiesToken{}, &azureError
 	}
 
