@@ -2,7 +2,6 @@ package rest
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -11,18 +10,19 @@ import (
 
 var (
 	azureIMDSEndpoint = "http://169.254.169.254/metadata/identity/oauth2/token"
-	defaultApiVersion = "2018-02-01"
+	defaultAPIVersion = "2018-02-01"
+	defaultResource   = "https://storage.azure.com/"
 	timeout           = time.Duration(5) * time.Second
 )
 
 // azureManagedIdentitiesToken holds a token for managed identities for Azure resources
 type azureManagedIdentitiesToken struct {
-	AccessToken  string `json:"access_token"`
-	ExpiresIn    string `json:"expires_in"`
-	ExpiresOn    string `json:"expires_on"`
-	NotBefore    string `json:"not_before"`
-	Resource     string `json:"resource"`
-	TokenType    string `json:"token_type"`
+	AccessToken string `json:"access_token"`
+	ExpiresIn   string `json:"expires_in"`
+	ExpiresOn   string `json:"expires_on"`
+	NotBefore   string `json:"not_before"`
+	Resource    string `json:"resource"`
+	TokenType   string `json:"token_type"`
 }
 
 // azureManagedIdentitiesError represents an error fetching an azureManagedIdentitiesToken
@@ -48,16 +48,16 @@ type azureManagedIdentitiesAuthPlugin struct {
 }
 
 func (ap *azureManagedIdentitiesAuthPlugin) NewClient(c Config) (*http.Client, error) {
+	if ap.Endpoint == "" {
+		ap.Endpoint = azureIMDSEndpoint
+	}
+
 	if ap.Resource == "" {
-		return nil, errors.New("resource URI is required when the azure managed identities plugin is enabled")
+		ap.Resource = defaultResource
 	}
 
 	if ap.APIVersion == "" {
-		ap.APIVersion = defaultApiVersion
-	}
-
-	if ap.Endpoint == "" {
-		ap.Endpoint = azureIMDSEndpoint
+		ap.APIVersion = defaultAPIVersion
 	}
 
 	t, err := DefaultTLSConfig(c)
@@ -83,21 +83,9 @@ func (ap *azureManagedIdentitiesAuthPlugin) Prepare(req *http.Request) error {
 
 // azureManagedIdentitiesTokenRequest fetches an azureManagedIdentitiesToken
 func azureManagedIdentitiesTokenRequest(
-	endpoint, apiVersion, resource, objectId, clientId, miResId string,
+	endpoint, apiVersion, resource, objectID, clientID, miResID string,
 ) (azureManagedIdentitiesToken, error) {
-	e := fmt.Sprintf("%s?api-version=%s&resource=%s", endpoint, apiVersion, resource)
-
-	if objectId != "" {
-		e += fmt.Sprintf("&object_id=%s", objectId)
-	}
-
-	if clientId != "" {
-		e += fmt.Sprintf("&client_id=%s", clientId)
-	}
-
-	if miResId != "" {
-		e += fmt.Sprintf("&mi_res_id=%s", miResId)
-	}
+	e := buildAzureManagedIdentitiesRequestPath(endpoint, apiVersion, resource, objectID, clientID, miResID)
 
 	request, err := http.NewRequest("GET", e, nil)
 	if err != nil {
@@ -136,4 +124,24 @@ func azureManagedIdentitiesTokenRequest(
 	}
 
 	return accessToken, nil
+}
+
+func buildAzureManagedIdentitiesRequestPath(
+	endpoint, apiVersion, resource, objectID, clientID, miResID string,
+) string {
+	path := fmt.Sprintf("%s?api-version=%s&resource=%s", endpoint, apiVersion, resource)
+
+	if objectID != "" {
+		path += fmt.Sprintf("&object_id=%s", objectID)
+	}
+
+	if clientID != "" {
+		path += fmt.Sprintf("&client_id=%s", clientID)
+	}
+
+	if miResID != "" {
+		path += fmt.Sprintf("&mi_res_id=%s", miResID)
+	}
+
+	return path
 }
