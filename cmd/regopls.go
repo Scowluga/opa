@@ -3,21 +3,22 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"os"
+
 	"github.com/open-policy-agent/opa/misc/regopls"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 type regoplsCommandParams struct {
-	testParam	bool
+	testParam bool
 }
 
 var regoplsParams = regoplsCommandParams{}
 
 var regoplsCommand = &cobra.Command{
-	Use:	"regopls [port]",
-	Short: 	"Start Rego language server",
-	Long:	`Start Rego language server.
+	Use:   "regopls [port]",
+	Short: "Start Rego language server",
+	Long: `Start Rego language server.
 WIP.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		_, err := startLanguageServer(args)
@@ -34,7 +35,7 @@ func startLanguageServer(args []string) (int, error) {
 	if len(args) != 1 {
 		return 0, errors.New("incorrect number of args")
 	}
-	regopls.Regopls()
+	regopls.StartLanguageServer()
 	return 0, nil
 }
 
