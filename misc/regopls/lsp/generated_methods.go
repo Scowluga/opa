@@ -242,7 +242,7 @@ func (m *Methods) didOpenTextDocumentMethodInfo() *jsonrpc.MethodInfo {
 		return nil
 	}
 	return &jsonrpc.MethodInfo{
-		Name: "didOpenTextDocument",
+		Name: "textDocument/didOpen",	// TODO: I don't think the change is supposed to be here, but in methods_structures.go - actually add the RegisterName param there
 		NewRequest: func() interface{} {
 			return &defines.DidOpenTextDocumentParams{}
 		},
@@ -270,7 +270,7 @@ func (m *Methods) didChangeTextDocumentMethodInfo() *jsonrpc.MethodInfo {
 		return nil
 	}
 	return &jsonrpc.MethodInfo{
-		Name: "didChangeTextDocument",
+		Name: "textDocument/didChange",
 		NewRequest: func() interface{} {
 			return &defines.DidChangeTextDocumentParams{}
 		},
